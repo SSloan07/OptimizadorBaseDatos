@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "GlobalIndex/GlobalRecordIndex.h"
-#include "GlobalIndex/GlobalRecordIndexLoader.h"
+#include "GlobalIndex/GlobalIndexPersistence.h"
 #include "GlobalIndex/IdGenerator.h"
 #include "Storage/FileIndex.h"
 #include "Storage/CommuneBlockManager.h"
@@ -18,6 +18,7 @@
 
 #define GLOBAL_INDEX_SIZE 1009
 #define RECORD_TABLE_SIZE 1009
+#define GLOBAL_INDEX_FILE "data/global_index.txt"
 
 static void limpiar_buffer_entrada(void) {
     int c;
@@ -59,7 +60,12 @@ int main(void) {
         return 1;
     }
 
-    inicializar_indice_global(global_index);
+    if (cargar_indice_global_desde_archivo(global_index, GLOBAL_INDEX_FILE) != 0) {
+        fprintf(stderr, "No se pudo cargar el indice global desde archivo.\n");
+        free_global_record_index(global_index);
+        return 1;
+    }
+
     inicializar_comunas();
 
     printf("Ingrese el id global del registro a consultar: ");
@@ -289,6 +295,17 @@ int main(void) {
         nueva_ubicacion.id_comuna = id_comuna_destino;
         nueva_ubicacion.id_bloque = id_bloque_destino;
         insert_global_record_index(global_index, nuevo.id, nueva_ubicacion);
+    }
+
+    if (guardar_indice_global_en_archivo(global_index, GLOBAL_INDEX_FILE) != 0) {
+        printf("No se pudo guardar el indice global actualizado.\n");
+        free_int_record_hash_table(record_table_destino);
+        free_int_record_hash_table(record_table_consulta);
+        free(contenido_descomprimido);
+        free(contenido_comprimido);
+        liberar_comunas();
+        free_global_record_index(global_index);
+        return 1;
     }
 
     printf("\n--- NUEVO REGISTRO INSERTADO EN MEMORIA ---\n");

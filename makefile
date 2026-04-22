@@ -16,6 +16,7 @@ SRC = main.c \
       Data/BlockWriter.c \
       GlobalIndex/GlobalRecordIndex.c \
       GlobalIndex/GlobalRecordIndexLoader.c \
+      GlobalIndex/GlobalIndexPersistence.c \
       GlobalIndex/IdGenerator.c \
       Compression/CompressionAdapter.c
 
@@ -37,6 +38,7 @@ main.o: main.c \
         Data/BlockWriter.h \
         GlobalIndex/GlobalRecordIndex.h \
         GlobalIndex/GlobalRecordIndexLoader.h \
+        GlobalIndex/GlobalIndexPersistence.h \
         GlobalIndex/IdGenerator.h \
         Storage/FileIndex.h \
         Storage/CommuneBlockManager.h \
@@ -89,6 +91,11 @@ GlobalIndex/GlobalRecordIndexLoader.o: GlobalIndex/GlobalRecordIndexLoader.c \
                                        GlobalIndex/GlobalRecordIndexLoader.h \
                                        GlobalIndex/GlobalRecordIndex.h
 	$(CC) $(CFLAGS) -c GlobalIndex/GlobalRecordIndexLoader.c -o GlobalIndex/GlobalRecordIndexLoader.o
+
+GlobalIndex/GlobalIndexPersistence.o: GlobalIndex/GlobalIndexPersistence.c \
+                                      GlobalIndex/GlobalIndexPersistence.h \
+                                      GlobalIndex/GlobalRecordIndex.h
+	$(CC) $(CFLAGS) -c GlobalIndex/GlobalIndexPersistence.c -o GlobalIndex/GlobalIndexPersistence.o
 
 GlobalIndex/IdGenerator.o: GlobalIndex/IdGenerator.c \
                            GlobalIndex/IdGenerator.h \
