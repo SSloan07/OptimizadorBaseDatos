@@ -1,0 +1,3 @@
+registro_245678,juan perez,medellin
+registro_245679,maria lopez,medellin
+registro_245680,carlos mesa,medellin
