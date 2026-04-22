@@ -1,6 +1,8 @@
 #ifndef FILE_READER_H
 #define FILE_READER_H
 
-char *leer_archivo_completo(const char *ruta);
+#include <stddef.h>
+
+unsigned char *leer_archivo_binario(const char *ruta, size_t *size);
 
 #endif

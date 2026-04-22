@@ -5,6 +5,7 @@
 #include "GlobalIndex/GlobalRecordIndexLoader.h"
 #include "Storage/FileIndex.h"
 #include "IO/FileReader.h"
+#include "Compression/CompressionAdapter.h"
 #include "Data/BlockLoader.h"
 #include "Data/IntRecordHashTable.h"
 
@@ -14,11 +15,17 @@
 int main(void) {
     int id_registro;
     char ruta[256];
-    char *contenido;
-    GlobalRecordIndex *global_index;
-    RecordLocation *location;
-    IntRecordHashTable *record_table;
-    Record *record;
+
+    GlobalRecordIndex *global_index = NULL;
+    RecordLocation *location = NULL;
+
+    unsigned char *contenido_comprimido = NULL;
+    unsigned char *contenido_descomprimido = NULL;
+    size_t compressed_size = 0;
+    size_t decompressed_size = 0;
+
+    IntRecordHashTable *record_table = NULL;
+    Record *record = NULL;
 
     global_index = create_global_record_index(GLOBAL_INDEX_SIZE);
     if (global_index == NULL) {
@@ -44,17 +51,35 @@ int main(void) {
 
     construir_ruta_bloque(location->id_comuna, location->id_bloque, ruta, sizeof(ruta));
 
-    contenido = leer_archivo_completo(ruta);
-    if (contenido == NULL) {
+    contenido_comprimido = leer_archivo_binario(ruta, &compressed_size);
+    if (contenido_comprimido == NULL) {
         printf("No se pudo leer el archivo.\n");
         free_global_record_index(global_index);
         return 1;
     }
 
-    record_table = cargar_bloque_en_hash_table(contenido, RECORD_TABLE_SIZE);
+    contenido_descomprimido = decompress_buffer(
+        contenido_comprimido,
+        compressed_size,
+        &decompressed_size
+    );
+
+    if (contenido_descomprimido == NULL) {
+        printf("No se pudo descomprimir el archivo.\n");
+        free(contenido_comprimido);
+        free_global_record_index(global_index);
+        return 1;
+    }
+
+    record_table = cargar_bloque_en_hash_table(
+        (const char *)contenido_descomprimido,
+        RECORD_TABLE_SIZE
+    );
+
     if (record_table == NULL) {
         printf("No se pudo cargar el bloque en la hash table.\n");
-        free(contenido);
+        free(contenido_descomprimido);
+        free(contenido_comprimido);
         free_global_record_index(global_index);
         return 1;
     }
@@ -77,7 +102,8 @@ int main(void) {
     }
 
     free_int_record_hash_table(record_table);
-    free(contenido);
+    free(contenido_descomprimido);
+    free(contenido_comprimido);
     free_global_record_index(global_index);
 
     return 0;

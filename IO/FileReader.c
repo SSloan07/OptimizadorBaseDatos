@@ -2,11 +2,16 @@
 #include <stdlib.h>
 #include "FileReader.h"
 
-char *leer_archivo_completo(const char *ruta) {
-    FILE *archivo = fopen(ruta, "rb");
-    char *buffer;
+unsigned char *leer_archivo_binario(const char *ruta, size_t *size) {
+    FILE *archivo;
+    unsigned char *buffer;
     long tamano;
 
+    if (ruta == NULL || size == NULL) {
+        return NULL;
+    }
+
+    archivo = fopen(ruta, "rb");
     if (archivo == NULL) {
         return NULL;
     }
@@ -27,7 +32,7 @@ char *leer_archivo_completo(const char *ruta) {
         return NULL;
     }
 
-    buffer = (char *)malloc((size_t)tamano + 1);
+    buffer = (unsigned char *)malloc((size_t)tamano);
     if (buffer == NULL) {
         fclose(archivo);
         return NULL;
@@ -39,8 +44,7 @@ char *leer_archivo_completo(const char *ruta) {
         return NULL;
     }
 
-    buffer[tamano] = '\0';
-
     fclose(archivo);
+    *size = (size_t)tamano;
     return buffer;
 }

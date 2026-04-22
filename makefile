@@ -11,7 +11,8 @@ SRC = main.c \
       Data/IntRecordHashTable.c \
       Data/BlockLoader.c \
       GlobalIndex/GlobalRecordIndex.c \
-      GlobalIndex/GlobalRecordIndexLoader.c
+      GlobalIndex/GlobalRecordIndexLoader.c \
+      Compression/CompressionAdapter.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -26,6 +27,7 @@ main.o: main.c \
         Storage/PartitionManager.h \
         Storage/FileIndex.h \
         IO/FileReader.h \
+        Compression/CompressionAdapter.h \
         Data/Record.h \
         Data/IntRecordHashTable.h \
         Data/BlockLoader.h \
@@ -50,6 +52,9 @@ Storage/FileIndex.o: Storage/FileIndex.c Storage/FileIndex.h
 
 IO/FileReader.o: IO/FileReader.c IO/FileReader.h
 	$(CC) $(CFLAGS) -c IO/FileReader.c -o IO/FileReader.o
+
+Compression/CompressionAdapter.o: Compression/CompressionAdapter.c Compression/CompressionAdapter.h
+	$(CC) $(CFLAGS) -c Compression/CompressionAdapter.c -o Compression/CompressionAdapter.o
 
 Data/IntRecordHashTable.o: Data/IntRecordHashTable.c Data/IntRecordHashTable.h Data/Record.h
 	$(CC) $(CFLAGS) -c Data/IntRecordHashTable.c -o Data/IntRecordHashTable.o
