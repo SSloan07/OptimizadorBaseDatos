@@ -1,20 +1,21 @@
 #include "MedellinCommunes.h"
 
-Comuna *diccionario = NULL;
+Comuna *diccionario_comunas = NULL;
 
 static void insertar_comuna(const char *nombre, int id) {
-    Comuna *c = malloc(sizeof(Comuna));
-    if (c == NULL) {
-        printf("Error al reservar memoria\n");
-        exit(1);
+    Comuna *comuna = malloc(sizeof(Comuna));
+    if (comuna == NULL) {
+        fprintf(stderr, "Error: no se pudo reservar memoria para una comuna.\n");
+        exit(EXIT_FAILURE);
     }
 
-    strcpy(c->nombre, nombre);
-    c->id = id;
-    HASH_ADD_STR(diccionario, nombre, c);
+    strcpy(comuna->nombre, nombre);
+    comuna->id = id;
+
+    HASH_ADD_STR(diccionario_comunas, nombre, comuna);
 }
 
-void inicializar_comunas() {
+void inicializar_comunas(void) {
     insertar_comuna("popular", 1);
     insertar_comuna("santa cruz", 2);
     insertar_comuna("manrique", 3);
@@ -26,7 +27,7 @@ void inicializar_comunas() {
     insertar_comuna("buenos aires", 9);
     insertar_comuna("la candelaria", 10);
     insertar_comuna("laureles", 11);
-    insertar_comuna("america", 12);
+    insertar_comuna("la america", 12);
     insertar_comuna("san javier", 13);
     insertar_comuna("poblado", 14);
     insertar_comuna("guayabal", 15);
@@ -34,12 +35,12 @@ void inicializar_comunas() {
 }
 
 int obtener_id_comuna(const char *nombre) {
-    Comuna *c;
-    HASH_FIND_STR(diccionario, nombre, c);
+    Comuna *comuna_encontrada = NULL;
+    HASH_FIND_STR(diccionario_comunas, nombre, comuna_encontrada);
 
-    if (c != NULL) {
-        return c->id;
+    if (comuna_encontrada == NULL) {
+        return -1;
     }
 
-    return -1;
+    return comuna_encontrada->id;
 }

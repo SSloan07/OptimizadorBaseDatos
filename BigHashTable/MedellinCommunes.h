@@ -1,5 +1,5 @@
-#ifndef MEDELLINCOMMUNES_H
-#define MEDELLINCOMMUNES_H
+#ifndef MEDELLIN_COMMUNES_H
+#define MEDELLIN_COMMUNES_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,9 +12,9 @@ typedef struct {
     UT_hash_handle hh;
 } Comuna;
 
-extern Comuna *diccionario;
+extern Comuna *diccionario_comunas;
 
-void inicializar_comunas();
+void inicializar_comunas(void);
 int obtener_id_comuna(const char *nombre);
 
 #endif
