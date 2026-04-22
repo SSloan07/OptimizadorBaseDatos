@@ -21,19 +21,19 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c \
-        BigHashTable/MedellinCommunes.h \
-        DataStructures/StringIntHashTable.h \
-        Storage/PartitionManager.h \
-        Storage/FileIndex.h \
-        IO/FileReader.h \
-        Compression/CompressionAdapter.h \
-        Data/Record.h \
-        Data/IntRecordHashTable.h \
-        Data/BlockLoader.h \
-        GlobalIndex/GlobalRecordIndex.h \
-        GlobalIndex/GlobalRecordIndexLoader.h
-	$(CC) $(CFLAGS) -c main.c
+SRC = main.c \
+      BigHashTable/MedellinCommunes.c \
+      DataStructures/StringIntHashTable.c \
+      Storage/PartitionManager.c \
+      Storage/FileIndex.c \
+      IO/FileReader.c \
+      IO/FileWriter.c \
+      Data/IntRecordHashTable.c \
+      Data/BlockLoader.c \
+      Data/BlockWriter.c \
+      GlobalIndex/GlobalRecordIndex.c \
+      GlobalIndex/GlobalRecordIndexLoader.c \
+      Compression/CompressionAdapter.c
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
                                  BigHashTable/MedellinCommunes.h \
@@ -53,6 +53,9 @@ Storage/FileIndex.o: Storage/FileIndex.c Storage/FileIndex.h
 IO/FileReader.o: IO/FileReader.c IO/FileReader.h
 	$(CC) $(CFLAGS) -c IO/FileReader.c -o IO/FileReader.o
 
+IO/FileWriter.o: IO/FileWriter.c IO/FileWriter.h
+	$(CC) $(CFLAGS) -c IO/FileWriter.c -o IO/FileWriter.o
+
 Compression/CompressionAdapter.o: Compression/CompressionAdapter.c Compression/CompressionAdapter.h
 	$(CC) $(CFLAGS) -c Compression/CompressionAdapter.c -o Compression/CompressionAdapter.o
 
@@ -69,6 +72,9 @@ GlobalIndex/GlobalRecordIndexLoader.o: GlobalIndex/GlobalRecordIndexLoader.c \
                                        GlobalIndex/GlobalRecordIndexLoader.h \
                                        GlobalIndex/GlobalRecordIndex.h
 	$(CC) $(CFLAGS) -c GlobalIndex/GlobalRecordIndexLoader.c -o GlobalIndex/GlobalRecordIndexLoader.o
+
+
+
 
 clean:
 	rm -f $(OBJ) $(TARGET)

@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "GlobalIndex/GlobalRecordIndex.h"
 #include "GlobalIndex/GlobalRecordIndexLoader.h"
 #include "Storage/FileIndex.h"
 #include "IO/FileReader.h"
+#include "IO/FileWriter.h"
 #include "Compression/CompressionAdapter.h"
 #include "Data/BlockLoader.h"
 #include "Data/IntRecordHashTable.h"
+#include "Data/BlockWriter.h"
 
 #define GLOBAL_INDEX_SIZE 1009
 #define RECORD_TABLE_SIZE 1009
@@ -15,17 +18,24 @@
 int main(void) {
     int id_registro;
     char ruta[256];
+    char ruta_salida[300];
 
     GlobalRecordIndex *global_index = NULL;
     RecordLocation *location = NULL;
 
     unsigned char *contenido_comprimido = NULL;
+    unsigned char *contenido_recomprimido = NULL;
     unsigned char *contenido_descomprimido = NULL;
+
     size_t compressed_size = 0;
     size_t decompressed_size = 0;
+    size_t recompressed_size = 0;
 
     IntRecordHashTable *record_table = NULL;
     Record *record = NULL;
+
+    char *bloque_serializado = NULL;
+    int write_result;
 
     global_index = create_global_record_index(GLOBAL_INDEX_SIZE);
     if (global_index == NULL) {
@@ -90,7 +100,7 @@ int main(void) {
     printf("ID registro: %d\n", id_registro);
     printf("ID comuna: %d\n", location->id_comuna);
     printf("Bloque: %d\n", location->id_bloque);
-    printf("Ruta archivo: %s\n", ruta);
+    printf("Ruta archivo original: %s\n", ruta);
 
     if (record == NULL) {
         printf("Registro no encontrado dentro del bloque.\n");
@@ -101,6 +111,62 @@ int main(void) {
         printf("Ciudad: %s\n", record->ciudad);
     }
 
+    bloque_serializado = serializar_hash_table_a_bloque(record_table);
+    if (bloque_serializado == NULL) {
+        printf("\nNo se pudo serializar la hash table.\n");
+        free_int_record_hash_table(record_table);
+        free(contenido_descomprimido);
+        free(contenido_comprimido);
+        free_global_record_index(global_index);
+        return 1;
+    }
+
+    printf("\n--- BLOQUE SERIALIZADO ---\n");
+    printf("%s\n", bloque_serializado);
+
+    contenido_recomprimido = compress_buffer(
+        (const unsigned char *)bloque_serializado,
+        strlen(bloque_serializado),
+        &recompressed_size
+    );
+
+    if (contenido_recomprimido == NULL) {
+        printf("No se pudo recomprimir el bloque.\n");
+        free(bloque_serializado);
+        free_int_record_hash_table(record_table);
+        free(contenido_descomprimido);
+        free(contenido_comprimido);
+        free_global_record_index(global_index);
+        return 1;
+    }
+
+    snprintf(ruta_salida, sizeof(ruta_salida), "%s.out", ruta);
+
+    write_result = escribir_archivo_binario(
+        ruta_salida,
+        contenido_recomprimido,
+        recompressed_size
+    );
+
+    if (write_result != 0) {
+        printf("No se pudo escribir el archivo de salida.\n");
+        free(contenido_recomprimido);
+        free(bloque_serializado);
+        free_int_record_hash_table(record_table);
+        free(contenido_descomprimido);
+        free(contenido_comprimido);
+        free_global_record_index(global_index);
+        return 1;
+    }
+
+    printf("\n--- ARCHIVO GENERADO ---\n");
+    printf("Ruta archivo salida: %s\n", ruta_salida);
+    printf("Tamano comprimido original: %zu bytes\n", compressed_size);
+    printf("Tamano descomprimido: %zu bytes\n", decompressed_size);
+    printf("Tamano recomprimido: %zu bytes\n", recompressed_size);
+
+    free(contenido_recomprimido);
+    free(bloque_serializado);
     free_int_record_hash_table(record_table);
     free(contenido_descomprimido);
     free(contenido_comprimido);
