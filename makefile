@@ -4,6 +4,7 @@ TARGET = programa
 
 SRC = main.c \
       BigHashTable/MedellinCommunes.c \
+      DataStructures/StringIntHashTable.c \
       Storage/PartitionManager.c \
       Storage/FileIndex.c \
       IO/FileReader.c
@@ -15,11 +16,22 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c BigHashTable/MedellinCommunes.h Storage/PartitionManager.h Storage/FileIndex.h IO/FileReader.h
+main.o: main.c \
+        BigHashTable/MedellinCommunes.h \
+        Storage/PartitionManager.h \
+        Storage/FileIndex.h \
+        IO/FileReader.h \
+        DataStructures/StringIntHashTable.h
 	$(CC) $(CFLAGS) -c main.c
 
-BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c BigHashTable/MedellinCommunes.h
+BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
+                                 BigHashTable/MedellinCommunes.h \
+                                 DataStructures/StringIntHashTable.h
 	$(CC) $(CFLAGS) -c BigHashTable/MedellinCommunes.c -o BigHashTable/MedellinCommunes.o
+
+DataStructures/StringIntHashTable.o: DataStructures/StringIntHashTable.c \
+                                     DataStructures/StringIntHashTable.h
+	$(CC) $(CFLAGS) -c DataStructures/StringIntHashTable.c -o DataStructures/StringIntHashTable.o
 
 Storage/PartitionManager.o: Storage/PartitionManager.c Storage/PartitionManager.h
 	$(CC) $(CFLAGS) -c Storage/PartitionManager.c -o Storage/PartitionManager.o
