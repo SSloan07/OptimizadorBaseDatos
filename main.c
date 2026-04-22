@@ -4,6 +4,7 @@
 
 #include "BigHashTable/MedellinCommunes.h"
 #include "Storage/PartitionManager.h"
+#include "Storage/FileIndex.h"
 
 #define TAM_BLOQUE 100000
 
@@ -14,45 +15,45 @@ static void convertir_a_minusculas(char *texto) {
 }
 
 int main(void) {
-    char nombre_comuna[100];
+    char comuna[100];
     int id_comuna;
     int id_registro;
     int id_bloque;
+    char ruta[256];
 
     inicializar_comunas();
 
     printf("Ingrese el nombre de la comuna: ");
-    if (fgets(nombre_comuna, sizeof(nombre_comuna), stdin) == NULL) {
-        fprintf(stderr, "Error al leer la comuna.\n");
-        return 1;
-    }
+    fgets(comuna, sizeof(comuna), stdin);
 
-    nombre_comuna[strcspn(nombre_comuna, "\n")] = '\0';
-    convertir_a_minusculas(nombre_comuna);
+    comuna[strcspn(comuna, "\n")] = '\0';
+    convertir_a_minusculas(comuna);
 
-    id_comuna = obtener_id_comuna(nombre_comuna);
+    id_comuna = obtener_id_comuna(comuna);
 
     if (id_comuna == -1) {
-        printf("Comuna no encontrada.\n");
+        printf("Comuna no encontrada\n");
         return 1;
     }
 
     printf("Ingrese el id del registro: ");
-    if (scanf("%d", &id_registro) != 1) {
-        fprintf(stderr, "Error al leer el id del registro.\n");
-        return 1;
-    }
+    scanf("%d", &id_registro);
 
     id_bloque = calcular_bloque(id_registro, TAM_BLOQUE);
 
     if (id_bloque == -1) {
-        printf("ID de registro invalido.\n");
+        printf("ID de registro invalido\n");
         return 1;
     }
 
+    construir_ruta_bloque(id_comuna, id_bloque, ruta, sizeof(ruta));
+
+    printf("\n--- RESULTADO ---\n");
+    printf("Comuna: %s\n", comuna);
     printf("ID comuna: %d\n", id_comuna);
     printf("ID registro: %d\n", id_registro);
-    printf("Bloque calculado: %d\n", id_bloque);
+    printf("Bloque: %d\n", id_bloque);
+    printf("Ruta archivo: %s\n", ruta);
 
     return 0;
 }

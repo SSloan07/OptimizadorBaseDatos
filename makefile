@@ -4,7 +4,8 @@ TARGET = programa
 
 SRC = main.c \
       BigHashTable/MedellinCommunes.c \
-      Storage/PartitionManager.c
+      Storage/PartitionManager.c \
+      Storage/FileIndex.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -13,7 +14,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c BigHashTable/MedellinCommunes.h Storage/PartitionManager.h
+main.o: main.c BigHashTable/MedellinCommunes.h Storage/PartitionManager.h Storage/FileIndex.h
 	$(CC) $(CFLAGS) -c main.c
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c BigHashTable/MedellinCommunes.h
@@ -21,6 +22,9 @@ BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c BigHashTable/Me
 
 Storage/PartitionManager.o: Storage/PartitionManager.c Storage/PartitionManager.h
 	$(CC) $(CFLAGS) -c Storage/PartitionManager.c -o Storage/PartitionManager.o
+
+Storage/FileIndex.o: Storage/FileIndex.c Storage/FileIndex.h
+	$(CC) $(CFLAGS) -c Storage/FileIndex.c -o Storage/FileIndex.o
 
 clean:
 	rm -f $(OBJ) $(TARGET)
