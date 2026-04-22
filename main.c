@@ -1,79 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
-#include "BigHashTable/MedellinCommunes.h"
-#include "Storage/PartitionManager.h"
+#include "GlobalIndex/GlobalRecordIndex.h"
+#include "GlobalIndex/GlobalRecordIndexLoader.h"
 #include "Storage/FileIndex.h"
 #include "IO/FileReader.h"
+#include "Data/BlockLoader.h"
+#include "Data/IntRecordHashTable.h"
 
-#define TAM_BLOQUE 100000
-
-static void convertir_a_minusculas(char *texto) {
-    for (int i = 0; texto[i] != '\0'; i++) {
-        texto[i] = (char)tolower((unsigned char)texto[i]);
-    }
-}
+#define GLOBAL_INDEX_SIZE 1009
+#define RECORD_TABLE_SIZE 1009
 
 int main(void) {
-    char comuna[100];
-    int id_comuna;
     int id_registro;
-    int id_bloque;
     char ruta[256];
     char *contenido;
+    GlobalRecordIndex *global_index;
+    RecordLocation *location;
+    IntRecordHashTable *record_table;
+    Record *record;
 
-    inicializar_comunas();
-
-    printf("Ingrese el nombre de la comuna: ");
-    if (fgets(comuna, sizeof(comuna), stdin) == NULL) {
-        fprintf(stderr, "Error al leer la comuna.\n");
+    global_index = create_global_record_index(GLOBAL_INDEX_SIZE);
+    if (global_index == NULL) {
+        fprintf(stderr, "No se pudo crear el indice global.\n");
         return 1;
     }
 
-    comuna[strcspn(comuna, "\n")] = '\0';
-    convertir_a_minusculas(comuna);
+    inicializar_indice_global(global_index);
 
-    id_comuna = obtener_id_comuna(comuna);
-
-    if (id_comuna == -1) {
-        printf("Comuna no encontrada.\n");
-        return 1;
-    }
-
-    printf("Ingrese el id del registro: ");
+    printf("Ingrese el id global del registro: ");
     if (scanf("%d", &id_registro) != 1) {
         fprintf(stderr, "Error al leer el id del registro.\n");
+        free_global_record_index(global_index);
         return 1;
     }
 
-    id_bloque = calcular_bloque(id_registro, TAM_BLOQUE);
-
-    if (id_bloque == -1) {
-        printf("ID de registro invalido.\n");
+    location = search_global_record_index(global_index, id_registro);
+    if (location == NULL) {
+        printf("Registro no encontrado en el indice global.\n");
+        free_global_record_index(global_index);
         return 1;
     }
 
-    construir_ruta_bloque(id_comuna, id_bloque, ruta, sizeof(ruta));
+    construir_ruta_bloque(location->id_comuna, location->id_bloque, ruta, sizeof(ruta));
 
     contenido = leer_archivo_completo(ruta);
-
-    printf("\n--- RESULTADO ---\n");
-    printf("Comuna: %s\n", comuna);
-    printf("ID comuna: %d\n", id_comuna);
-    printf("ID registro: %d\n", id_registro);
-    printf("Bloque: %d\n", id_bloque);
-    printf("Ruta archivo: %s\n", ruta);
-
     if (contenido == NULL) {
         printf("No se pudo leer el archivo.\n");
+        free_global_record_index(global_index);
         return 1;
     }
 
-    printf("\n--- CONTENIDO DEL ARCHIVO ---\n");
-    printf("%s\n", contenido);
+    record_table = cargar_bloque_en_hash_table(contenido, RECORD_TABLE_SIZE);
+    if (record_table == NULL) {
+        printf("No se pudo cargar el bloque en la hash table.\n");
+        free(contenido);
+        free_global_record_index(global_index);
+        return 1;
+    }
 
+    record = search_int_record(record_table, id_registro);
+
+    printf("\n--- RESULTADO ---\n");
+    printf("ID registro: %d\n", id_registro);
+    printf("ID comuna: %d\n", location->id_comuna);
+    printf("Bloque: %d\n", location->id_bloque);
+    printf("Ruta archivo: %s\n", ruta);
+
+    if (record == NULL) {
+        printf("Registro no encontrado dentro del bloque.\n");
+    } else {
+        printf("\n--- REGISTRO ENCONTRADO ---\n");
+        printf("ID: %d\n", record->id);
+        printf("Nombre: %s\n", record->nombre);
+        printf("Ciudad: %s\n", record->ciudad);
+    }
+
+    free_int_record_hash_table(record_table);
     free(contenido);
+    free_global_record_index(global_index);
+
     return 0;
 }
