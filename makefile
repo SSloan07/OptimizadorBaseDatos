@@ -8,8 +8,10 @@ SRC = main.c \
       Storage/PartitionManager.c \
       Storage/FileIndex.c \
       IO/FileReader.c \
+      IO/FileWriter.c \
       Data/IntRecordHashTable.c \
       Data/BlockLoader.c \
+      Data/BlockWriter.c \
       GlobalIndex/GlobalRecordIndex.c \
       GlobalIndex/GlobalRecordIndexLoader.c \
       Compression/CompressionAdapter.c
@@ -21,19 +23,18 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-SRC = main.c \
-      BigHashTable/MedellinCommunes.c \
-      DataStructures/StringIntHashTable.c \
-      Storage/PartitionManager.c \
-      Storage/FileIndex.c \
-      IO/FileReader.c \
-      IO/FileWriter.c \
-      Data/IntRecordHashTable.c \
-      Data/BlockLoader.c \
-      Data/BlockWriter.c \
-      GlobalIndex/GlobalRecordIndex.c \
-      GlobalIndex/GlobalRecordIndexLoader.c \
-      Compression/CompressionAdapter.c
+main.o: main.c \
+        IO/FileReader.h \
+        IO/FileWriter.h \
+        Compression/CompressionAdapter.h \
+        Data/Record.h \
+        Data/IntRecordHashTable.h \
+        Data/BlockLoader.h \
+        Data/BlockWriter.h \
+        GlobalIndex/GlobalRecordIndex.h \
+        GlobalIndex/GlobalRecordIndexLoader.h \
+        Storage/FileIndex.h
+	$(CC) $(CFLAGS) -c main.c
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
                                  BigHashTable/MedellinCommunes.h \
@@ -65,6 +66,9 @@ Data/IntRecordHashTable.o: Data/IntRecordHashTable.c Data/IntRecordHashTable.h D
 Data/BlockLoader.o: Data/BlockLoader.c Data/BlockLoader.h Data/IntRecordHashTable.h Data/Record.h
 	$(CC) $(CFLAGS) -c Data/BlockLoader.c -o Data/BlockLoader.o
 
+Data/BlockWriter.o: Data/BlockWriter.c Data/BlockWriter.h Data/IntRecordHashTable.h Data/Record.h
+	$(CC) $(CFLAGS) -c Data/BlockWriter.c -o Data/BlockWriter.o
+
 GlobalIndex/GlobalRecordIndex.o: GlobalIndex/GlobalRecordIndex.c GlobalIndex/GlobalRecordIndex.h
 	$(CC) $(CFLAGS) -c GlobalIndex/GlobalRecordIndex.c -o GlobalIndex/GlobalRecordIndex.o
 
@@ -72,9 +76,6 @@ GlobalIndex/GlobalRecordIndexLoader.o: GlobalIndex/GlobalRecordIndexLoader.c \
                                        GlobalIndex/GlobalRecordIndexLoader.h \
                                        GlobalIndex/GlobalRecordIndex.h
 	$(CC) $(CFLAGS) -c GlobalIndex/GlobalRecordIndexLoader.c -o GlobalIndex/GlobalRecordIndexLoader.o
-
-
-
 
 clean:
 	rm -f $(OBJ) $(TARGET)

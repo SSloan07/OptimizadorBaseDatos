@@ -37,6 +37,8 @@ int main(void) {
     char *bloque_serializado = NULL;
     int write_result;
 
+    Record nuevo;
+
     global_index = create_global_record_index(GLOBAL_INDEX_SIZE);
     if (global_index == NULL) {
         fprintf(stderr, "No se pudo crear el indice global.\n");
@@ -45,7 +47,7 @@ int main(void) {
 
     inicializar_indice_global(global_index);
 
-    printf("Ingrese el id global del registro: ");
+    printf("Ingrese el id global del registro a consultar: ");
     if (scanf("%d", &id_registro) != 1) {
         fprintf(stderr, "Error al leer el id del registro.\n");
         free_global_record_index(global_index);
@@ -96,8 +98,8 @@ int main(void) {
 
     record = search_int_record(record_table, id_registro);
 
-    printf("\n--- RESULTADO ---\n");
-    printf("ID registro: %d\n", id_registro);
+    printf("\n--- RESULTADO ANTES DE INSERTAR ---\n");
+    printf("ID registro consultado: %d\n", id_registro);
     printf("ID comuna: %d\n", location->id_comuna);
     printf("Bloque: %d\n", location->id_bloque);
     printf("Ruta archivo original: %s\n", ruta);
@@ -111,6 +113,18 @@ int main(void) {
         printf("Ciudad: %s\n", record->ciudad);
     }
 
+    /* Insercion de prueba */
+    nuevo.id = 245681;
+    strcpy(nuevo.nombre, "ana gomez");
+    strcpy(nuevo.ciudad, "medellin");
+
+    insert_int_record(record_table, nuevo.id, nuevo);
+
+    printf("\n--- NUEVO REGISTRO INSERTADO EN MEMORIA ---\n");
+    printf("ID: %d\n", nuevo.id);
+    printf("Nombre: %s\n", nuevo.nombre);
+    printf("Ciudad: %s\n", nuevo.ciudad);
+
     bloque_serializado = serializar_hash_table_a_bloque(record_table);
     if (bloque_serializado == NULL) {
         printf("\nNo se pudo serializar la hash table.\n");
@@ -121,7 +135,7 @@ int main(void) {
         return 1;
     }
 
-    printf("\n--- BLOQUE SERIALIZADO ---\n");
+    printf("\n--- BLOQUE SERIALIZADO DESPUES DE INSERTAR ---\n");
     printf("%s\n", bloque_serializado);
 
     contenido_recomprimido = compress_buffer(
