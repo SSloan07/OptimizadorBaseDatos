@@ -1,3 +1,4 @@
 registro_245678,juan perez,15,secundaria,el poblado
 registro_245679,maria lopez,16,media,el poblado
 registro_245680,carlos mesa,14,secundaria,el poblado
+registro_245683,Angie,24,Profesional,el poblado

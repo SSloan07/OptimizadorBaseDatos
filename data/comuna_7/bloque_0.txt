@@ -1,1 +1,2 @@
 registro_245682,Angie,23,Profesional,robledo
+registro_245684,flor ,27,profesional,robledo

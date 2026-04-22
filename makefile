@@ -3,6 +3,9 @@ CFLAGS = -Wall -Wextra -std=c11
 TARGET = programa
 
 SRC = main.c \
+      App/Menu.c \
+      App/SearchService.c \
+      App/InsertService.c \
       BigHashTable/MedellinCommunes.c \
       DataStructures/StringIntHashTable.c \
       Storage/PartitionManager.c \
@@ -27,23 +30,25 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c \
-        IO/FileReader.h \
-        IO/FileWriter.h \
-        IO/DirectoryManager.h \
-        Compression/CompressionAdapter.h \
-        Data/Record.h \
-        Data/IntRecordHashTable.h \
-        Data/BlockLoader.h \
-        Data/BlockWriter.h \
-        GlobalIndex/GlobalRecordIndex.h \
-        GlobalIndex/GlobalRecordIndexLoader.h \
-        GlobalIndex/GlobalIndexPersistence.h \
-        GlobalIndex/IdGenerator.h \
-        Storage/FileIndex.h \
-        Storage/CommuneBlockManager.h \
-        BigHashTable/MedellinCommunes.h
+main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h
 	$(CC) $(CFLAGS) -c main.c
+
+App/Menu.o: App/Menu.c App/Menu.h
+	$(CC) $(CFLAGS) -c App/Menu.c -o App/Menu.o
+
+App/SearchService.o: App/SearchService.c App/SearchService.h \
+                     GlobalIndex/GlobalRecordIndex.h \
+                     GlobalIndex/GlobalIndexPersistence.h \
+                     Storage/FileIndex.h \
+                     IO/FileReader.h \
+                     Compression/CompressionAdapter.h \
+                     Data/BlockLoader.h \
+                     Data/IntRecordHashTable.h \
+                     Data/Record.h
+	$(CC) $(CFLAGS) -c App/SearchService.c -o App/SearchService.o
+
+App/InsertService.o: App/InsertService.c App/InsertService.h
+	$(CC) $(CFLAGS) -c App/InsertService.c -o App/InsertService.o
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
                                  BigHashTable/MedellinCommunes.h \
