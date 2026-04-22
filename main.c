@@ -30,7 +30,7 @@ int main(void) {
     int id_registro;
     char ruta_consulta[256];
     char ruta_destino[256];
-    char ruta_salida[300];
+    char ruta_salida[256];
 
     GlobalRecordIndex *global_index = NULL;
     RecordLocation *location = NULL;
@@ -361,7 +361,8 @@ int main(void) {
         return 1;
     }
 
-    snprintf(ruta_salida, sizeof(ruta_salida), "%s.out", ruta_destino);
+    strncpy(ruta_salida, ruta_destino, sizeof(ruta_salida) - 1);
+    ruta_salida[sizeof(ruta_salida) - 1] = '\0';
 
     write_result = escribir_archivo_binario(
         ruta_salida,
@@ -370,7 +371,7 @@ int main(void) {
     );
 
     if (write_result != 0) {
-        printf("No se pudo escribir el archivo de salida destino.\n");
+        printf("No se pudo escribir el archivo destino.\n");
         free(contenido_recomprimido);
         free(bloque_serializado);
         free_int_record_hash_table(record_table_destino);
@@ -382,8 +383,8 @@ int main(void) {
         return 1;
     }
 
-    printf("\n--- ARCHIVO GENERADO ---\n");
-    printf("Ruta archivo salida: %s\n", ruta_salida);
+    printf("\n--- ARCHIVO SOBRESCRITO / CREADO ---\n");
+    printf("Ruta archivo destino: %s\n", ruta_salida);
     printf("Tamano recomprimido: %zu bytes\n", recompressed_size);
 
     free(contenido_recomprimido);
