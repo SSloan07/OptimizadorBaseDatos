@@ -30,10 +30,12 @@ char *serializar_hash_table_a_bloque(IntRecordHashTable *table) {
             int escritos = snprintf(
                 linea,
                 sizeof(linea),
-                "registro_%d,%s,%s\n",
+                "registro_%d,%s,%d,%s,%s\n",
                 current->value.id,
                 current->value.nombre,
-                current->value.ciudad
+                current->value.edad,
+                current->value.escolaridad,
+                current->value.comuna
             );
 
             if (escritos < 0) {

@@ -30,7 +30,12 @@ IntRecordHashTable *cargar_bloque_en_hash_table(const char *contenido_bloque, in
         Record record;
         int id;
 
-        if (sscanf(linea, "registro_%d,%99[^,],%99[^\n]", &id, record.nombre, record.ciudad) == 3) {
+        if (sscanf(linea, "registro_%d,%99[^,],%d,%49[^,],%99[^\n]",
+                   &id,
+                   record.nombre,
+                   &record.edad,
+                   record.escolaridad,
+                   record.comuna) == 5) {
             record.id = id;
             insert_int_record(table, record.id, record);
         }
