@@ -3,6 +3,7 @@ CFLAGS = -Wall -Wextra -std=c11
 TARGET = programa
 
 SRC = main.c \
+      App/AppContext.c \
       App/Menu.c \
       App/SearchService.c \
       App/InsertService.c \
@@ -21,7 +22,11 @@ SRC = main.c \
       GlobalIndex/GlobalRecordIndexLoader.c \
       GlobalIndex/GlobalIndexPersistence.c \
       GlobalIndex/IdGenerator.c \
-      Compression/CompressionAdapter.c
+      Compression/CompressionAdapter.c \
+      Synthetic/SyntheticGenerator.c \
+      Synthetic/SyntheticBatchInsert.c \
+      Synthetic/BatchGroup.c \
+      Synthetic/BatchProcessor.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -30,15 +35,20 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h
+main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h App/AppContext.h
 	$(CC) $(CFLAGS) -c main.c
+
+App/AppContext.o: App/AppContext.c App/AppContext.h \
+                  GlobalIndex/GlobalRecordIndex.h \
+                  GlobalIndex/GlobalIndexPersistence.h
+	$(CC) $(CFLAGS) -c App/AppContext.c -o App/AppContext.o
 
 App/Menu.o: App/Menu.c App/Menu.h
 	$(CC) $(CFLAGS) -c App/Menu.c -o App/Menu.o
 
 App/SearchService.o: App/SearchService.c App/SearchService.h \
+                     App/AppContext.h \
                      GlobalIndex/GlobalRecordIndex.h \
-                     GlobalIndex/GlobalIndexPersistence.h \
                      Storage/FileIndex.h \
                      IO/FileReader.h \
                      Compression/CompressionAdapter.h \
@@ -47,7 +57,22 @@ App/SearchService.o: App/SearchService.c App/SearchService.h \
                      Data/Record.h
 	$(CC) $(CFLAGS) -c App/SearchService.c -o App/SearchService.o
 
-App/InsertService.o: App/InsertService.c App/InsertService.h
+App/InsertService.o: App/InsertService.c App/InsertService.h \
+                     App/AppContext.h \
+                     Synthetic/SyntheticBatchInsert.h \
+                     GlobalIndex/GlobalIndexPersistence.h \
+                     GlobalIndex/IdGenerator.h \
+                     Storage/FileIndex.h \
+                     Storage/CommuneBlockManager.h \
+                     BigHashTable/MedellinCommunes.h \
+                     IO/FileReader.h \
+                     IO/FileWriter.h \
+                     IO/DirectoryManager.h \
+                     Compression/CompressionAdapter.h \
+                     Data/BlockLoader.h \
+                     Data/IntRecordHashTable.h \
+                     Data/BlockWriter.h \
+                     Data/Record.h
 	$(CC) $(CFLAGS) -c App/InsertService.c -o App/InsertService.o
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
@@ -106,6 +131,44 @@ GlobalIndex/IdGenerator.o: GlobalIndex/IdGenerator.c \
                            GlobalIndex/IdGenerator.h \
                            GlobalIndex/GlobalRecordIndex.h
 	$(CC) $(CFLAGS) -c GlobalIndex/IdGenerator.c -o GlobalIndex/IdGenerator.o
+
+Synthetic/SyntheticGenerator.o: Synthetic/SyntheticGenerator.c \
+                                Synthetic/SyntheticGenerator.h \
+                                Data/Record.h
+	$(CC) $(CFLAGS) -c Synthetic/SyntheticGenerator.c -o Synthetic/SyntheticGenerator.o
+
+Synthetic/BatchGroup.o: Synthetic/BatchGroup.c \
+                        Synthetic/BatchGroup.h \
+                        Data/Record.h
+	$(CC) $(CFLAGS) -c Synthetic/BatchGroup.c -o Synthetic/BatchGroup.o
+
+Synthetic/BatchProcessor.o: Synthetic/BatchProcessor.c \
+                            Synthetic/BatchProcessor.h \
+                            Synthetic/BatchGroup.h \
+                            Storage/FileIndex.h \
+                            IO/FileReader.h \
+                            IO/FileWriter.h \
+                            IO/DirectoryManager.h \
+                            Compression/CompressionAdapter.h \
+                            Data/BlockLoader.h \
+                            Data/IntRecordHashTable.h \
+                            Data/BlockWriter.h \
+                            Data/Record.h
+	$(CC) $(CFLAGS) -c Synthetic/BatchProcessor.c -o Synthetic/BatchProcessor.o
+
+Synthetic/SyntheticBatchInsert.o: Synthetic/SyntheticBatchInsert.c \
+                                  Synthetic/SyntheticBatchInsert.h \
+                                  Synthetic/SyntheticGenerator.h \
+                                  Synthetic/BatchGroup.h \
+                                  Synthetic/BatchProcessor.h \
+                                  App/AppContext.h \
+                                  GlobalIndex/GlobalRecordIndex.h \
+                                  GlobalIndex/GlobalIndexPersistence.h \
+                                  GlobalIndex/IdGenerator.h \
+                                  Storage/CommuneBlockManager.h \
+                                  BigHashTable/MedellinCommunes.h \
+                                  Data/Record.h
+	$(CC) $(CFLAGS) -c Synthetic/SyntheticBatchInsert.c -o Synthetic/SyntheticBatchInsert.o
 
 clean:
 	rm -f $(OBJ) $(TARGET)

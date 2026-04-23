@@ -6,7 +6,7 @@ int mostrar_menu_principal(void) {
 
     printf("\n===== MENU PRINCIPAL =====\n");
     printf("1. Buscar un registro puntual\n");
-    printf("2. Insertar registros masivamente\n");
+    printf("2. Menú de Inserción\n");
     printf("3. Salir\n");
     printf("Seleccione una opcion: ");
 

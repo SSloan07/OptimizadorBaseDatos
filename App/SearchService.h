@@ -1,6 +1,8 @@
 #ifndef SEARCH_SERVICE_H
 #define SEARCH_SERVICE_H
 
-int ejecutar_busqueda_puntual(void);
+#include "AppContext.h"
+
+int ejecutar_busqueda_puntual(AppContext *ctx);
 
 #endif
