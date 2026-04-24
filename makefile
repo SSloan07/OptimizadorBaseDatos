@@ -26,7 +26,10 @@ SRC = main.c \
       Synthetic/SyntheticGenerator.c \
       Synthetic/SyntheticBatchInsert.c \
       Synthetic/BatchGroup.c \
-      Synthetic/BatchProcessor.c
+      Synthetic/BatchProcessor.c \
+      LZW/compress.c \
+      LZW/decompress.c \
+      LZW/dictionary.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -35,7 +38,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h App/AppContext.h
+main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h App/AppContext.h 
 	$(CC) $(CFLAGS) -c main.c
 
 App/AppContext.o: App/AppContext.c App/AppContext.h \
@@ -169,6 +172,15 @@ Synthetic/SyntheticBatchInsert.o: Synthetic/SyntheticBatchInsert.c \
                                   BigHashTable/MedellinCommunes.h \
                                   Data/Record.h
 	$(CC) $(CFLAGS) -c Synthetic/SyntheticBatchInsert.c -o Synthetic/SyntheticBatchInsert.o
+
+LZW/compress.o: LZW/compress.c LZW/compress.h LZW/dictionary.h
+	$(CC) $(CFLAGS) -c LZW/compress.c -o LZW/compress.o
+
+LZW/decompress.o: LZW/decompress.c LZW/decompress.h LZW/dictionary.h
+	$(CC) $(CFLAGS) -c LZW/decompress.c -o LZW/decompress.o
+
+LZW/dictionary.o: LZW/dictionary.c LZW/dictionary.h
+	$(CC) $(CFLAGS) -c LZW/dictionary.c -o LZW/dictionary.o
 
 clean:
 	rm -f $(OBJ) $(TARGET)
