@@ -121,10 +121,10 @@ DecompressStats lzw_decompress(const unsigned char *input, size_t input_size,
 cleanup:
     *output_size = out_pos;
 
-    printf("Comprimido:    %zu bytes\n", input_size);
-    printf("Descomprimido: %zu bytes\n", out_pos);
+    // printf("Comprimido:    %zu bytes\n", input_size);
+    // printf("Descomprimido: %zu bytes\n", out_pos);
     if (out_pos > 0)
-        printf("Tasa:          %.2f%%\n", 100.0 * input_size / out_pos);
+        // printf("Tasa:          %.2f%%\n", 100.0 * input_size / out_pos);
 
     free(buffer);
     dict_destroy(dict);

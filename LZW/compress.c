@@ -65,10 +65,10 @@ CompressStats lzw_compress(const unsigned char *input, size_t input_size,
 
     *output_size = out_pos;
 
-    printf("Original:   %zu bytes\n", input_size);
-    printf("Comprimido: %zu bytes\n", out_pos);
+    // printf("Original:   %zu bytes\n", input_size);
+    // printf("Comprimido: %zu bytes\n", out_pos);
     if (input_size > 0)
-        printf("Tasa:       %.2f%%\n", 100.0 * out_pos / input_size);
+        // printf("Tasa:       %.2f%%\n", 100.0 * out_pos / input_size);
 
     dict_destroy(dict);
     return stats;
