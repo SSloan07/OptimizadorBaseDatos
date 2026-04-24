@@ -11,12 +11,6 @@ typedef struct {
     int    error;           /* 0 = éxito, != 0 = error */
 } CompressStats;
 
-/* Comprime el contenido de 'input' y escribe el resultado en 'output'.
-   Ambos archivos deben estar ya abiertos (input en lectura, output en
-   escritura binaria).
-
-   Formato de salida: secuencia de uint16_t en little-endian (el orden
-   nativo de x86/ARM). Cada código ocupa exactamente 2 bytes. */
-CompressStats lzw_compress(FILE *input, FILE *output);
+CompressStats lzw_compress(const unsigned char *input, size_t input_size, unsigned char *output, size_t output_cap, size_t *output_size);
 
 #endif /* COMPRESS_H */

@@ -2,18 +2,17 @@
 #include "dictionary.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-/* Escribe un código de 16 bits al archivo en little-endian.
-   Retorna 0 en éxito, !=0 si falla la escritura. */
-static int emit_code(uint32_t code, FILE *output) {
-    uint8_t bytes[2];
-    bytes[0] = (uint8_t)(code & 0xFF);          /* byte bajo */
-    bytes[1] = (uint8_t)((code >> 8) & 0xFF);   /* byte alto */
-    return fwrite(bytes, 1, 2, output) == 2 ? 0 : 1;
-}
-
-CompressStats lzw_compress(FILE *input, FILE *output) {
+CompressStats lzw_compress(const unsigned char *input, size_t input_size,
+                           unsigned char *output, size_t output_cap,
+                           size_t *output_size) {
     CompressStats stats = {0, 0, 0};
+
+    if (!input || !output || !output_size) {
+        stats.error = 1;
+        return stats;
+    }
 
     Dictionary *dict = dict_create();
     if (!dict) {
@@ -21,52 +20,55 @@ CompressStats lzw_compress(FILE *input, FILE *output) {
         return stats;
     }
 
-    // 'w' representa el código de la cadena actual acumulada. INVALID_CODE significa "todavía no tenemos prefijo".
+    size_t out_pos = 0;
     uint32_t w = INVALID_CODE;
-    int c;  // fgetc retorna int para poder distinguir EOF (-1)
 
-    while ((c = fgetc(input)) != EOF) {
+    for (size_t i = 0; i < input_size; i++) {
         stats.bytes_read++;
-        uint8_t byte = (uint8_t)c;
+        uint8_t byte = input[i];
 
         if (w == INVALID_CODE) {
-            // Primer byte del archivo: se convierte en prefijo sin emitir
             w = byte;
             continue;
         }
 
-        /* ¿Existe la cadena (w + byte) en el diccionario? */
         uint32_t combined = dict_lookup(dict, w, byte);
 
         if (combined != INVALID_CODE) {
-            // Sí existe: extendemos el prefijo
             w = combined;
         } else {
-            // No existe: emitimos w, insertamos (w+byte), y reiniciamos el prefijo con el byte actual
-            if (emit_code(w, output) != 0) {
+            /* Emitir w en little-endian */
+            if (out_pos + 2 > output_cap) {
                 stats.error = 2;
                 dict_destroy(dict);
                 return stats;
             }
+            output[out_pos++] = (uint8_t)(w & 0xFF);
+            output[out_pos++] = (uint8_t)((w >> 8) & 0xFF);
             stats.codes_written++;
 
-            /* dict_insert puede retornar INVALID_CODE si está lleno.
-               En esa situación simplemente no agregamos más entradas,
-               pero seguimos comprimiendo con el diccionario existente. */
             dict_insert(dict, w, byte);
-
             w = byte;
         }
     }
 
-    /* Al terminar, queda un último prefijo por emitir (si leímos algo) */
+    /* Último prefijo pendiente */
     if (w != INVALID_CODE) {
-        if (emit_code(w, output) != 0) {
+        if (out_pos + 2 > output_cap) {
             stats.error = 2;
         } else {
+            output[out_pos++] = (uint8_t)(w & 0xFF);
+            output[out_pos++] = (uint8_t)((w >> 8) & 0xFF);
             stats.codes_written++;
         }
     }
+
+    *output_size = out_pos;
+
+    printf("Original:   %zu bytes\n", input_size);
+    printf("Comprimido: %zu bytes\n", out_pos);
+    if (input_size > 0)
+        printf("Tasa:       %.2f%%\n", 100.0 * out_pos / input_size);
 
     dict_destroy(dict);
     return stats;

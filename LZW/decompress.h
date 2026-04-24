@@ -13,6 +13,5 @@ typedef struct {
 /* Descomprime 'input' y escribe el resultado en 'output'.
    El formato esperado es el mismo que produce lzw_compress:
    secuencia de uint16_t en little-endian. */
-DecompressStats lzw_decompress(FILE *input, FILE *output);
-
+DecompressStats lzw_decompress(const unsigned char *input, size_t input_size, unsigned char *output, size_t output_cap, size_t *output_size);
 #endif /* DECOMPRESS_H */
