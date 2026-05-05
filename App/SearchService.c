@@ -17,7 +17,7 @@
 #define RECORD_TABLE_SIZE 1009
 
 // Clave (Mala practica) pero pues como versión inicial la pusimos así. 
-#define AES_PROJECT_KEY "CSF123"
+#define AES_PROJECT_KEY "CSF123CSF123CSF123CSF123CS12"
 
 int ejecutar_busqueda_puntual(AppContext *ctx) {
     int id_registro;

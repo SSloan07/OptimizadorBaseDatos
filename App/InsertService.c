@@ -25,7 +25,7 @@
 #define GLOBAL_INDEX_FILE "data/global_index.txt"
 
 // Clave temporal . Se podría poner en un .env (Somos conscientes de que esta no es la mejor práctica)
-#define AES_PROJECT_KEY "0123456789abcdef0123456789abcdef"
+#define AES_PROJECT_KEY "CSF123CSF123CSF123CSF123CS12"
 
 static void limpiar_buffer_entrada(void) {
     int c;
