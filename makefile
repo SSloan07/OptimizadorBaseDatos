@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
+LDLIBS = -lcrypto
 TARGET = programa
 
 SRC = main.c \
@@ -23,6 +24,8 @@ SRC = main.c \
       GlobalIndex/GlobalIndexPersistence.c \
       GlobalIndex/IdGenerator.c \
       Compression/CompressionAdapter.c \
+      Encryption/Encripter.c \
+      AES/AesEncripter.c \
       Synthetic/SyntheticGenerator.c \
       Synthetic/SyntheticBatchInsert.c \
       Synthetic/BatchGroup.c \
@@ -36,9 +39,9 @@ OBJ = $(SRC:.c=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(LDLIBS)
 
-main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h App/AppContext.h 
+main.o: main.c App/Menu.h App/SearchService.h App/InsertService.h App/AppContext.h
 	$(CC) $(CFLAGS) -c main.c
 
 App/AppContext.o: App/AppContext.c App/AppContext.h \
@@ -57,7 +60,9 @@ App/SearchService.o: App/SearchService.c App/SearchService.h \
                      Compression/CompressionAdapter.h \
                      Data/BlockLoader.h \
                      Data/IntRecordHashTable.h \
-                     Data/Record.h
+                     Data/Record.h \
+                     Encryption/Encripter.h \
+                     AES/AesEncripter.h
 	$(CC) $(CFLAGS) -c App/SearchService.c -o App/SearchService.o
 
 App/InsertService.o: App/InsertService.c App/InsertService.h \
@@ -75,7 +80,9 @@ App/InsertService.o: App/InsertService.c App/InsertService.h \
                      Data/BlockLoader.h \
                      Data/IntRecordHashTable.h \
                      Data/BlockWriter.h \
-                     Data/Record.h
+                     Data/Record.h \
+                     Encryption/Encripter.h \
+                     AES/AesEncripter.h
 	$(CC) $(CFLAGS) -c App/InsertService.c -o App/InsertService.o
 
 BigHashTable/MedellinCommunes.o: BigHashTable/MedellinCommunes.c \
@@ -107,6 +114,12 @@ IO/DirectoryManager.o: IO/DirectoryManager.c IO/DirectoryManager.h
 
 Compression/CompressionAdapter.o: Compression/CompressionAdapter.c Compression/CompressionAdapter.h
 	$(CC) $(CFLAGS) -c Compression/CompressionAdapter.c -o Compression/CompressionAdapter.o
+
+Encryption/Encripter.o: Encryption/Encripter.c Encryption/Encripter.h
+	$(CC) $(CFLAGS) -c Encryption/Encripter.c -o Encryption/Encripter.o
+
+AES/AesEncripter.o: AES/AesEncripter.c AES/AesEncripter.h Encryption/Encripter.h
+	$(CC) $(CFLAGS) -c AES/AesEncripter.c -o AES/AesEncripter.o
 
 Data/IntRecordHashTable.o: Data/IntRecordHashTable.c Data/IntRecordHashTable.h Data/Record.h
 	$(CC) $(CFLAGS) -c Data/IntRecordHashTable.c -o Data/IntRecordHashTable.o
