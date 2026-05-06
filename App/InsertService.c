@@ -25,7 +25,10 @@
 #define GLOBAL_INDEX_FILE "data/global_index.txt"
 
 // Clave temporal . Se podría poner en un .env (Somos conscientes de que esta no es la mejor práctica)
-#define AES_PROJECT_KEY "CSF123CSF123CSF123CSF123CS12"
+static const unsigned char AES_PROJECT_KEY[] =
+    "CSF123CSF123CSF123CSF123CS12CSF1";
+
+_Static_assert(sizeof(AES_PROJECT_KEY) - 1 == 32, "La clave AES-256 debe tener exactamente 32 caracteres");
 
 static void limpiar_buffer_entrada(void) {
     int c;
@@ -131,9 +134,7 @@ static int insertar_registro_puntual(AppContext *ctx) {
     printf("Bloque destino: %d\n", id_bloque_destino);
     printf("Ruta destino: %s\n", ruta_destino);
 
-    encripter = create_aes_256_gcm_encripter(
-        (const unsigned char *)AES_PROJECT_KEY
-    );
+    encripter = create_aes_256_gcm_encripter(AES_PROJECT_KEY);
 
     if (encripter == NULL) {
         fprintf(stderr, "No se pudo crear el encripter AES.\n");

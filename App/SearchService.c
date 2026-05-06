@@ -17,7 +17,9 @@
 #define RECORD_TABLE_SIZE 1009
 
 // Clave (Mala practica) pero pues como versión inicial la pusimos así. 
-#define AES_PROJECT_KEY "CSF123CSF123CSF123CSF123CS12"
+static const unsigned char AES_PROJECT_KEY[] = "CSF123CSF123CSF123CSF123CS12CSF1";
+
+_Static_assert(sizeof(AES_PROJECT_KEY) - 1 == 32, "La clave AES-256 debe tener exactamente 32 caracteres");
 
 int ejecutar_busqueda_puntual(AppContext *ctx) {
     int id_registro;
@@ -79,9 +81,7 @@ int ejecutar_busqueda_puntual(AppContext *ctx) {
         sizeof(ruta)
     );
 
-    encripter = create_aes_256_gcm_encripter(
-        (const unsigned char *)AES_PROJECT_KEY
-    );
+    encripter = create_aes_256_gcm_encripter(AES_PROJECT_KEY);
 
     if (encripter == NULL) {
         fprintf(stderr, "No se pudo crear el encripter AES.\n");
