@@ -32,7 +32,8 @@ SRC = main.c \
       Synthetic/BatchProcessor.c \
       LZW/compress.c \
       LZW/decompress.c \
-      LZW/dictionary.c
+      LZW/dictionary.c \
+      App/BenchmarkUtils.c
 
 OBJ = $(SRC:.c=.o)
 
